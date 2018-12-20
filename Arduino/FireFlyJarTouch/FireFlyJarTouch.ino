@@ -1,4 +1,4 @@
-#include <Adafruit_NeoPixel.h> 
+#include <FastLED.h> 
 #include <CapacitiveSensor.h>
 
 // Parameter 1 = number of pixels in strip
@@ -12,6 +12,8 @@
 // USER VARS
 int mode = 1;
 int numMode = 12;
+#define NUM_LEDS      40
+#define LED_DATA_PIN  4
 
 // INIT STUFF
 
@@ -29,11 +31,10 @@ int direction = 1;
 CapacitiveSensor cs1 = CapacitiveSensor(0, 1); // 10M resistor between pins 0 & 1
 
 // Start Strip
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(5, 4, NEO_GRB + NEO_KHZ800);
+CRGB leds[NUM_LEDS];
 
 void setup() {
-    strip.begin();
-    strip.show(); // Initialize all pixels to 'off'
+  FastLED.addLeds<WS2811, LED_DATA_PIN>(leds, NUM_LEDS);
 }
 
 void loop() {
@@ -47,8 +48,6 @@ void loop() {
     if (mode > numMode) { mode = 1; }
     // main function
     doSomething(mode);
-
-
 }
 
 
@@ -64,24 +63,24 @@ void doSomething(int var) {
         rainbow(20);
         break;
     case 2:
-        colorWipe(strip.Color(random(255), random(255), random(255)), 140); 
+        colorWipe(CRGB(random(255), random(255), random(255)), 140); 
         break;
     case 3:
         twinkle(3, random(0, 4));
-        colorFast(strip.Color(180, 0, 180), 0);
+        colorFast(CRGB(180, 0, 180), 0);
         break;
     case 4:
         rainbowCycle(10);
         break;
-    case 5:
-        sineFirefly(70);
-        counter++;
-        break;
+//    case 5:
+//        sineFirefly(70);
+//        counter++;
+//        break;
     case 6:
-        colorFast(strip.Color(255, 255, 255), 0); // white
+        colorFast(CRGB(255, 255, 255), 0); // white
         break;
     case 7:
-        colorFast(strip.Color(255, 147, 41), 0); // white
+        colorFast(CRGB(255, 147, 41), 0); // white
         break;
     case 8:
         rainbow(1);
@@ -89,15 +88,15 @@ void doSomething(int var) {
     case 9:
         flame();
         break;
-    case 10:
-        chaseLights(100);
-        break;     
-    case 11:
-        colorFirefly(100);
-        counter++;
-        break;  
-    case 12:
-        totallyRandom();
+//    case 10:
+//        chaseLights(100);
+//        break;     
+//    case 11:
+//        colorFirefly(100);
+//        counter++;
+//        break;  
+//    case 12:
+//        totallyRandom();
     default:
         rainbow(2);
         // if nothing else matches, do the default
@@ -115,9 +114,9 @@ void doSomething(int var) {
 
 // Fill the dots one after the other with a color
 void colorWipe(uint32_t c, uint8_t wait) {
-    for (uint16_t i = 0; i < strip.numPixels(); i++) {
-        strip.setPixelColor(i, c);
-        strip.show();
+    for (uint16_t i = 0; i < NUM_LEDS; i++) {
+        leds[i] = c;
+        FastLED.show();
         delay(wait);
     }
 }
@@ -125,10 +124,10 @@ void colorWipe(uint32_t c, uint8_t wait) {
 // fast version 
 
 void colorFast(uint32_t c, uint8_t wait) {
-    for (uint16_t i = 0; i < strip.numPixels(); i++) {
-        strip.setPixelColor(i, c);
+    for (uint16_t i = 0; i < NUM_LEDS; i++) {
+        leds[i] = c;
     }
-     strip.show();
+     FastLED.show();
     delay(wait);
 }
 
@@ -137,10 +136,10 @@ void rainbow(uint8_t wait) {
     uint16_t i;
 
     //for(j=0; j<256; j++) {
-    for (i = 0; i < strip.numPixels(); i++) {
-        strip.setPixelColor(i, Wheel((i + j) & 255));
+    for (i = 0; i < NUM_LEDS; i++) {
+        leds[i] = Wheel((i + j) & 255);
     }
-    strip.show();
+    FastLED.show();
     delay(wait);
     // }
 }
@@ -150,68 +149,65 @@ void rainbowCycle(uint8_t wait) {
     uint16_t i;
 
     //  for(j=0; j<256*5; j++) { // 5 cycles of all colors on wheel
-    for (i = 0; i < strip.numPixels(); i++) {
-        strip.setPixelColor(i, Wheel(((i * 256 / strip.numPixels()) + j) & 255));
+    for (i = 0; i < NUM_LEDS; i++) {
+        leds[i] = Wheel(((i * 256 / NUM_LEDS) + j) & 255);
     }
-    strip.show();
+    FastLED.show();
     delay(wait);
     // }
 }
 
 // Input a value 0 to 255 to get a color value.
 // The colours are a transition r - g - b - back to r.
-uint32_t Wheel(byte WheelPos) {
+CRGB Wheel(byte WheelPos) {
     if (WheelPos < 85) {
-        return strip.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
+        return CRGB(WheelPos * 3, 255 - WheelPos * 3, 0);
     } else if (WheelPos < 170) {
         WheelPos -= 85;
-        return strip.Color(255 - WheelPos * 3, 0, WheelPos * 3);
+        return CRGB(255 - WheelPos * 3, 0, WheelPos * 3);
     } else {
         WheelPos -= 170;
-        return strip.Color(0, WheelPos * 3, 255 - WheelPos * 3);
+        return CRGB(0, WheelPos * 3, 255 - WheelPos * 3);
     }
 }
 
 void chaseLights(int wait) { //-POLICE LIGHTS (TWO COLOR SINGLE LED)
     idex++;
-    if (idex >= strip.numPixels()) {
+    if (idex >= NUM_LEDS) {
         idex = 0;
     }
     int idexR = idex;
     int idexB = antipodal_index(idexR);
-    for (int i = 0; i < strip.numPixels(); i++) {
+    for (int i = 0; i < NUM_LEDS; i++) {
         if (i == idexR) {
-            strip.setPixelColor(i, 00, 255, 0);
+            leds[i] = CRGB(00, 255, 0);
         } else if (i == idexB) {
-            strip.setPixelColor(i, 0, 0, 255);
+            leds[i] = CRGB(0, 0, 255);
         } else {
-            strip.setPixelColor(i, 0, 0, 0);
+            leds[i] = CRGB(0, 0, 0);
         }
     }
-    strip.show();
+    FastLED.show();
     delay(wait);
 }
 
 void twinkle(int q, int num) {
     for (int x = 1; x < num; x++) {
-        strip.setPixelColor(random(strip.numPixels()), 255, 255, 255);
+        leds[random(NUM_LEDS)] = CRGB(255, 255, 255);
     }
-    strip.show();
+    FastLED.show();
     delay(50);
 }
 
 
 void flame() {
-    int colors[3];
     int idelay = random(30, 80);
 
-    for (int i = 0; i < strip.numPixels(); i++) {
-        HSVtoRGB(random(11,34), 255, random(200,255), colors);
-
-        strip.setPixelColor(i, colors[0], colors[1], colors[2]);
+    for (int i = 0; i < NUM_LEDS; i++) {
+        leds[i] = CHSV(random(11,34), 255, random(200,255));
     }    
-        strip.show();
-        delay(idelay);
+    FastLED.show();
+    delay(idelay);
    
 }
 
@@ -220,49 +216,44 @@ void sineFirefly(int wait) {
         if(myPix != lastPix) {
           if(counter<16) {
             float colorV = sin((6.28/30)*(float)(counter)) *255;
-            strip.setPixelColor(myPix,colorV,colorV,colorV);
+            leds[myPix] = CRGB(colorV,colorV,colorV);
 
-           strip.show();
-           delay(wait);
+            FastLED.show();
+            delay(wait);
           } else {
             lastPix=myPix;
             counter=0;
             colorFast(0,0);
           }
         } else {
-          myPix=random(0,strip.numPixels());
+          myPix=random(0,NUM_LEDS);
         }
 	
 }
 
 void totallyRandom() {
-        int colors[3];
-        for (int i = 0; i < strip.numPixels(); i++) {
-           HSVtoRGB(random(0,359), 255,255, colors);
-            strip.setPixelColor(i, colors[0], colors[1], colors[2]);
-
+        for (int i = 0; i < NUM_LEDS; i++) {
+           leds[i] = CHSV(random(0,359), 255, 255);
         }
-        strip.show();
+        FastLED.show();
         delay(50);
 }
 
 void colorFirefly(int wait) {
         if(myPix != lastPix) {
           if(counter<16) {
-            int colors[3];
             float colorV = sin((6.28/30)*(float)(counter)) *255;
-            HSVtoRGB((359/16)*counter, 255, colorV, colors);
-            strip.setPixelColor(myPix, colors[0], colors[1], colors[2]);
-
-           strip.show();
-           delay(wait);
+            leds[myPix] = CHSV((359/16)*counter, 255, colorV);
+            
+            FastLED.show();
+            delay(wait);
           } else {
             lastPix=myPix;
             counter=0;
             colorFast(0,0);
           }
         } else {
-          myPix=random(0,strip.numPixels());
+          myPix=random(0,NUM_LEDS);
         }
 	
 }
@@ -275,9 +266,9 @@ void colorFirefly(int wait) {
 // antipodal point
 int antipodal_index(int i) {
     //int N2 = int(NUM_LEDS/2);
-    int iN = i + strip.numPixels() / 2;
-    if (i >= (strip.numPixels() / 2)) {
-        iN = (i + (strip.numPixels() / 2)) % strip.numPixels();
+    int iN = i + NUM_LEDS / 2;
+    if (i >= (NUM_LEDS / 2)) {
+        iN = (i + (NUM_LEDS / 2)) % NUM_LEDS;
     }
     return iN;
 }
@@ -296,53 +287,3 @@ int horizontal_index(int i) {
     }
     return 6 - i;
 }
-
-// HSV to RGB colors
-void HSVtoRGB(int hue, int sat, int val, int * colors) {
-    int r, g, b, base;
-
-    // hue: 0-359, sat: 0-255, val (lightness): 0-255
-
-
-    if (sat == 0) { // Achromatic color (gray).
-        colors[0] = val;
-        colors[1] = val;
-        colors[2] = val;
-    } else {
-        base = ((255 - sat) * val) >> 8;
-        switch (hue / 60) {
-        case 0:
-            colors[0] = val;
-            colors[1] = (((val - base) * hue) / 60) + base;
-            colors[2] = base;
-            break;
-        case 1:
-            colors[0] = (((val - base) * (60 - (hue % 60))) / 60) + base;
-            colors[1] = val;
-            colors[2] = base;
-            break;
-        case 2:
-            colors[0] = base;
-            colors[1] = val;
-            colors[2] = (((val - base) * (hue % 60)) / 60) + base;
-            break;
-        case 3:
-            colors[0] = base;
-            colors[1] = (((val - base) * (60 - (hue % 60))) / 60) + base;
-            colors[2] = val;
-            break;
-        case 4:
-            colors[0] = (((val - base) * (hue % 60)) / 60) + base;
-            colors[1] = base;
-            colors[2] = val;
-            break;
-        case 5:
-            colors[0] = val;
-            colors[1] = base;
-            colors[2] = (((val - base) * (60 - (hue % 60))) / 60) + base;
-            break;
-        }
-
-    }
-}
-
