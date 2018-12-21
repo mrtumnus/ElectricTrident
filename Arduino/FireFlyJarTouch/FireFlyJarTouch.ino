@@ -9,11 +9,12 @@
 //   NEO_KHZ400  400 KHz bitstream (e.g. FLORA pixels)
 //   NEO_KHZ800  800 KHz bitstream (e.g. High Density LED strip)
 
-// USER VARS
-int mode = 1;
-int numMode = 12;
 #define NUM_LEDS      50
 #define LED_DATA_PIN  4
+#define NUM_MODES     12
+
+// USER VARS
+int mode = 0;
 
 // INIT STUFF
 
@@ -40,25 +41,22 @@ void setup() {
 void loop() {
     long total1 = cs1.capacitiveSensor(30);    
     if (total1 > 300 && (millis() - mark) > 800) {
-        j = 0;
-        mark = millis();
-        mode++;
+      j = 0;
+      mark = millis();
+      mode++;
     }
-    // if mode greater than numMode reset
-    if (mode > numMode) { mode = 1; }
+    // if mode greater than NUM_MODES reset
+    if (mode > NUM_MODES) { mode = 0; }
     // main function
     doSomething(mode);
 }
 
 
 void doSomething(int var) {
-    if (j > 254) {
-        direction = 0;
-    }
-    if (j < 1) {
-        direction = 1;
-    }
     switch (var) {
+    case 0:
+        colorFill(CRGB::Black, 0);
+        break;
     case 1:
         rainbow(20);
         break;
@@ -66,8 +64,8 @@ void doSomething(int var) {
         colorWipe(CRGB(random(255), random(255), random(255)), 140); 
         break;
     case 3:
-        twinkle(3, random(0, 4));
-        colorFast(CRGB(180, 0, 180), 0);
+        twinkle(3, random(0, 4));        
+        colorFill(CRGB(180, 0, 180), 0);
         break;
     case 4:
         rainbowCycle(10);
@@ -77,10 +75,10 @@ void doSomething(int var) {
 //        counter++;
 //        break;
     case 6:
-        colorFast(CRGB(255, 255, 255), 0); // white
+        colorFill(CRGB::White, 0);
         break;
     case 7:
-        colorFast(CRGB(255, 147, 41), 0); // white
+        colorFill(CRGB(255, 147, 41), 0); // orange
         break;
     case 8:
         rainbow(1);
@@ -88,54 +86,58 @@ void doSomething(int var) {
     case 9:
         flame();
         break;
-//    case 10:
-//        chaseLights(100);
-//        break;     
+    case 10:
+        chaseLights(100);
+        break;     
 //    case 11:
 //        colorFirefly(100);
 //        counter++;
-//        break;  
-//    case 12:
-//        totallyRandom();
+//        chaseLightsOddEven(100);
+        break;
+    case 12:
+        totallyRandom();
+        break;
     default:
-        rainbow(2);
-        // if nothing else matches, do the default
-        // default is optional
+        mode++;
+        break;
     }
-    if (direction == 1) {
-        j++;
-    } else {
-        j--;
+    
+    if (j > 254) {
+        direction = -1;
     }
+    if (j < 1) {
+        direction = 1;
+    }
+
+    j += direction;
 }
 
 // PATTERN FUNCTIONS
 // Created, or adapted from Adafruit and Funkboxing!
 
 // Fill the dots one after the other with a color
-void colorWipe(uint32_t c, uint8_t wait) {
-    for (uint16_t i = 0; i < NUM_LEDS; i++) {
-        leds[i] = c;
-        FastLED.show();
-        delay(wait);
-    }
+void colorWipe(CRGB c, uint8_t wait) {
+  static int nextLed = 0;
+
+  leds[nextLed] = c;
+  FastLED.show();
+  delay(wait);
+
+  if (++nextLed > NUM_LEDS) {
+    nextLed = 0;
+  }
 }
 
-// fast version 
-
-void colorFast(uint32_t c, uint8_t wait) {
-    for (uint16_t i = 0; i < NUM_LEDS; i++) {
-        leds[i] = c;
-    }
-     FastLED.show();
-    delay(wait);
+// Fill the entire strip with a single color at once
+void colorFill(CRGB c, uint8_t wait) {
+  FastLED.showColor(c);
+  delay(wait);
 }
 
 
 void rainbow(uint8_t wait) {
-    uint16_t i;
+    uint8_t i;
 
-    //for(j=0; j<256; j++) {
     for (i = 0; i < NUM_LEDS; i++) {
         leds[i] = Wheel((i + j) & 255);
     }
@@ -145,15 +147,13 @@ void rainbow(uint8_t wait) {
 
 // Slightly different, this makes the rainbow equally distributed throughout
 void rainbowCycle(uint8_t wait) {
-    uint16_t i;
+    uint8_t i;
 
-    //  for(j=0; j<256*5; j++) { // 5 cycles of all colors on wheel
     for (i = 0; i < NUM_LEDS; i++) {
         leds[i] = Wheel(((i * 256 / NUM_LEDS) + j) & 255);
     }
     FastLED.show();
     delay(wait);
-    // }
 }
 
 // Input a value 0 to 255 to get a color value.
@@ -179,20 +179,34 @@ void chaseLights(int wait) { //-POLICE LIGHTS (TWO COLOR SINGLE LED)
     int idexB = antipodal_index(idexR);
     for (int i = 0; i < NUM_LEDS; i++) {
         if (i == idexR) {
-            leds[i] = CRGB(00, 255, 0);
+            leds[i] = CRGB::Red;
         } else if (i == idexB) {
-            leds[i] = CRGB(0, 0, 255);
+            leds[i] = CRGB::Blue;
         } else {
-            leds[i] = CRGB(0, 0, 0);
+            leds[i] = CRGB::Black;
         }
     }
     FastLED.show();
     delay(wait);
 }
 
+void chaseLightsOddEven(int wait) { //-POLICE LIGHTS (TWO COLOR ODD/EVEN)
+  for (int i = 0; i < NUM_LEDS; i++) {
+    if (j & 1 && i & 1) {
+      leds[i] = CRGB::Red;
+    } else if (((j|i) & 1) == 0) {
+      leds[i] = CRGB::Blue;
+    } else {
+      leds[i] = CRGB::Black;
+    }
+  }
+  FastLED.show();
+  delay(wait);
+}
+
 void twinkle(int q, int num) {
     for (int x = 1; x < num; x++) {
-        leds[random(NUM_LEDS)] = CRGB(255, 255, 255);
+        leds[random(NUM_LEDS)] = CRGB::White;
     }
     FastLED.show();
     delay(50);
@@ -222,7 +236,7 @@ void sineFirefly(int wait) {
           } else {
             lastPix=myPix;
             counter=0;
-            colorFast(0,0);
+            colorFill(0,0);
           }
         } else {
           myPix=random(0,NUM_LEDS);
@@ -249,7 +263,7 @@ void colorFirefly(int wait) {
           } else {
             lastPix=myPix;
             counter=0;
-            colorFast(0,0);
+            colorFill(0,0);
           }
         } else {
           myPix=random(0,NUM_LEDS);
