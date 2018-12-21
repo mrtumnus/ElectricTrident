@@ -58,44 +58,43 @@ void doSomething(int var) {
         colorFill(CRGB::Black, 0);
         break;
     case 1:
-        rainbow(20);
-        break;
-    case 2:
-        colorWipe(CRGB(random(255), random(255), random(255)), 140); 
-        break;
-    case 3:
-        twinkle(3, random(0, 4));        
-        colorFill(CRGB(180, 0, 180), 0);
-        break;
-    case 4:
-        rainbowCycle(10);
-        break;
-//    case 5:
-//        sineFirefly(70);
-//        counter++;
-//        break;
-    case 6:
         colorFill(CRGB::White, 0);
         break;
-    case 7:
-        colorFill(CRGB(255, 147, 41), 0); // orange
+    case 2:
+        colorFill(CRGB(255, 147, 41), 0); // soft-white
         break;
-    case 8:
+    case 3:
+        flame();
+        break; 
+    case 4:
+        twinkle(CRGB(0, 0, 31), CRGB::White, 50);
+        break;
+    case 5:
+        chaseLights(100);
+        break;  
+    case 6:
+        rainbow(50);
+        break;
+    case 7:
         rainbow(1);
         break;
+    case 8:
+        rainbowCycle(10);
+        break;
     case 9:
-        flame();
+        totallyRandom();
         break;
     case 10:
-        chaseLights(100);
-        break;     
+        colorWipe(CRGB(random(255), random(255), random(255)), 100); 
+        break;
 //    case 11:
+//        sineFirefly(70);
+//        counter++;
+//        break;  
+//    case 12:
 //        colorFirefly(100);
 //        counter++;
 //        chaseLightsOddEven(100);
-        break;
-    case 12:
-        totallyRandom();
         break;
     default:
         mode++;
@@ -118,19 +117,24 @@ void doSomething(int var) {
 // Fill the dots one after the other with a color
 void colorWipe(CRGB c, uint8_t wait) {
   static int nextLed = 0;
+  static CRGB color = c;
 
-  leds[nextLed] = c;
+  leds[nextLed] = color;
   FastLED.show();
   delay(wait);
 
   if (++nextLed > NUM_LEDS) {
     nextLed = 0;
+    color = c;
   }
 }
 
 // Fill the entire strip with a single color at once
 void colorFill(CRGB c, uint8_t wait) {
-  FastLED.showColor(c);
+  for (int i = 0; i < NUM_LEDS; i++) {
+    leds[i] = c;
+  }
+  FastLED.show();
   delay(wait);
 }
 
@@ -204,12 +208,11 @@ void chaseLightsOddEven(int wait) { //-POLICE LIGHTS (TWO COLOR ODD/EVEN)
   delay(wait);
 }
 
-void twinkle(int q, int num) {
-    for (int x = 1; x < num; x++) {
-        leds[random(NUM_LEDS)] = CRGB::White;
-    }
+void twinkle(CRGB base, CRGB twinkle, int wait) {
+    leds[random(NUM_LEDS)] = twinkle;
     FastLED.show();
-    delay(50);
+    delay(wait);
+    colorFill(base, 0);
 }
 
 
