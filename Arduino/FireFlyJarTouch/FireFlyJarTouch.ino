@@ -9,7 +9,7 @@
 //   NEO_KHZ400  400 KHz bitstream (e.g. FLORA pixels)
 //   NEO_KHZ800  800 KHz bitstream (e.g. High Density LED strip)
 
-#define NUM_LEDS      50
+#define NUM_LEDS      10
 #define LED_DATA_PIN  4
 #define NUM_MODES     12
 
@@ -95,7 +95,7 @@ void doSomething(int var) {
 //        colorFirefly(100);
 //        counter++;
 //        chaseLightsOddEven(100);
-        break;
+//        break;
     default:
         mode++;
         break;
@@ -212,7 +212,7 @@ void twinkle(CRGB base, CRGB twinkle, int wait) {
     leds[random(NUM_LEDS)] = twinkle;
     FastLED.show();
     delay(wait);
-    colorFill(base, 0);
+    colorFill(base, random(30,500));
 }
 
 
