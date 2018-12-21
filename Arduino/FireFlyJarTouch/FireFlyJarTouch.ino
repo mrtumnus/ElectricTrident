@@ -18,15 +18,8 @@ int mode = 0;
 
 // INIT STUFF
 
-int idex = 0;
-int j = 0;
-unsigned long mark;
-int direct = 1;
 int counter = 0;
-int TOP_INDEX = 3;
-int BOTTOM_INDEX = 0;
-int EVENODD = 6 % 2;
-int direction = 1;
+int dir = 1;
 
 // Start Sensor
 CapacitiveSensor cs1 = CapacitiveSensor(0, 1); // 10M resistor between pins 0 & 1
@@ -39,10 +32,11 @@ void setup() {
 }
 
 void loop() {
+    static unsigned long lastTouchTime;
     long total1 = cs1.capacitiveSensor(30);    
-    if (total1 > 300 && (millis() - mark) > 800) {
-      j = 0;
-      mark = millis();
+    if (total1 > 300 && (millis() - lastTouchTime) > 800) {
+      counter = 0;
+      lastTouchTime = millis();
       mode++;
     }
     // if mode greater than NUM_MODES reset
@@ -57,43 +51,45 @@ void doSomething(int var) {
     case 0:
         colorFill(CRGB::Black, 0);
         break;
-    case 1:
-        colorFill(CRGB::White, 0);
-        break;
-    case 2:
-        colorFill(CRGB(255, 147, 41), 0); // soft-white
-        break;
-    case 3:
-        flame();
-        break; 
-    case 4:
-        twinkle(CRGB(0, 0, 31), CRGB::White, 50);
-        break;
-    case 5:
-        chaseLights(100);
-        break;  
-    case 6:
-        rainbow(50);
-        break;
-    case 7:
-        rainbow(1);
-        break;
-    case 8:
-        rainbowCycle(10);
-        break;
-    case 9:
-        totallyRandom();
-        break;
-    case 10:
-        colorWipe(CRGB(random(255), random(255), random(255)), 100); 
-        break;
+//    case 1:
+//        colorFill(CRGB::White, 0);
+//        break;
+//    case 2:
+//        colorFill(CRGB(255, 147, 41), 0); // soft-white
+//        break;
+//    case 3:
+//        flame();
+//        break; 
+//    case 4:
+//        twinkle(CRGB(0, 0, 31), CRGB::White, 50);
+//        break;
+//    case 5:
+//        chaseLights(CRGB:Red, CRGB:Blue, 100);
+//        break;  
+//    case 6:
+//        rainbow(50);
+//        break;
+//    case 7:
+//        rainbow(1);
+//        break;
+//    case 8:
+//        rainbowCycle(10);
+//        break;
+//    case 9:
+//        totallyRandom();
+//        break;
+//    case 10:
+//        colorWipe(CRGB(random(255), random(255), random(255)), 100); 
+//        break;
 //    case 11:
 //        sineFirefly(70);
 //        counter++;
 //        break;  
-//    case 12:
-//        colorFirefly(100);
-//        counter++;
+    case 12:
+        colorFirefly(100);
+        counter++;
+        break;
+//    case 13:
 //        chaseLightsOddEven(100);
 //        break;
     default:
@@ -101,14 +97,14 @@ void doSomething(int var) {
         break;
     }
     
-    if (j > 254) {
-        direction = -1;
+    if (counter > 254) {
+        dir = -1;
     }
-    if (j < 1) {
-        direction = 1;
+    if (counter < 1) {
+        dir = 1;
     }
 
-    j += direction;
+    counter += dir;
 }
 
 // PATTERN FUNCTIONS
@@ -140,10 +136,8 @@ void colorFill(CRGB c, uint8_t wait) {
 
 
 void rainbow(uint8_t wait) {
-    uint8_t i;
-
-    for (i = 0; i < NUM_LEDS; i++) {
-        leds[i] = Wheel((i + j) & 255);
+    for (int i = 0; i < NUM_LEDS; i++) {
+        leds[i] = Wheel((i + counter) & 255);
     }
     FastLED.show();
     delay(wait);
@@ -151,10 +145,8 @@ void rainbow(uint8_t wait) {
 
 // Slightly different, this makes the rainbow equally distributed throughout
 void rainbowCycle(uint8_t wait) {
-    uint8_t i;
-
-    for (i = 0; i < NUM_LEDS; i++) {
-        leds[i] = Wheel(((i * 256 / NUM_LEDS) + j) & 255);
+    for (int i = 0; i < NUM_LEDS; i++) {
+        leds[i] = Wheel(((i * 256 / NUM_LEDS) + counter) & 255);
     }
     FastLED.show();
     delay(wait);
@@ -174,18 +166,17 @@ CRGB Wheel(byte WheelPos) {
     }
 }
 
-void chaseLights(int wait) { //-POLICE LIGHTS (TWO COLOR SINGLE LED)
-    idex++;
-    if (idex >= NUM_LEDS) {
-        idex = 0;
+void chaseLights(CRGB c1, CRGB c2, int wait) { //-POLICE LIGHTS (TWO COLOR SINGLE LED)
+    if (counter >= NUM_LEDS) {
+        counter = 0;
     }
-    int idexR = idex;
+    int idexR = counter;
     int idexB = antipodal_index(idexR);
     for (int i = 0; i < NUM_LEDS; i++) {
         if (i == idexR) {
-            leds[i] = CRGB::Red;
+            leds[i] = c1;
         } else if (i == idexB) {
-            leds[i] = CRGB::Blue;
+            leds[i] = c2;
         } else {
             leds[i] = CRGB::Black;
         }
@@ -196,9 +187,9 @@ void chaseLights(int wait) { //-POLICE LIGHTS (TWO COLOR SINGLE LED)
 
 void chaseLightsOddEven(int wait) { //-POLICE LIGHTS (TWO COLOR ODD/EVEN)
   for (int i = 0; i < NUM_LEDS; i++) {
-    if (j & 1 && i & 1) {
+    if (counter & 1 && i & 1) {
       leds[i] = CRGB::Red;
-    } else if (((j|i) & 1) == 0) {
+    } else if (((counter|i) & 1) == 0) {
       leds[i] = CRGB::Blue;
     } else {
       leds[i] = CRGB::Black;
@@ -215,16 +206,20 @@ void twinkle(CRGB base, CRGB twinkle, int wait) {
     colorFill(base, random(30,500));
 }
 
+void randomize(int minHue, int maxHue, int minVal, int maxVal, int wait) {
+  for (int i = 0; i < NUM_LEDS; i++) {
+      leds[i] = CHSV(random(minHue,maxHue), 255, random(minVal,maxVal));
+  }    
+  FastLED.show();
+  delay(wait);
+}
 
 void flame() {
-    int idelay = random(30, 80);
+  randomize(11,34, 200,255, random(30,80));
+}
 
-    for (int i = 0; i < NUM_LEDS; i++) {
-        leds[i] = CHSV(random(11,34), 255, random(200,255));
-    }    
-    FastLED.show();
-    delay(idelay);
-   
+void totallyRandom() {
+  randomize(0,359, 255,255, 50);
 }
 
 int lastPix=0; int myPix=0;
@@ -247,31 +242,20 @@ void sineFirefly(int wait) {
 	
 }
 
-void totallyRandom() {
-        for (int i = 0; i < NUM_LEDS; i++) {
-           leds[i] = CHSV(random(0,359), 255, 255);
-        }
-        FastLED.show();
-        delay(50);
-}
-
+static const uint8_t brightnessTable[] = {0,52,103,149,189,220,242,253,253,242,220,189,150,104,53,0};
 void colorFirefly(int wait) {
-        if(myPix != lastPix) {
-          if(counter<16) {
-            float colorV = sin((6.28/30)*(float)(counter)) *255;
-            leds[myPix] = CHSV((359/16)*counter, 255, colorV);
-            
-            FastLED.show();
-            delay(wait);
-          } else {
-            lastPix=myPix;
-            counter=0;
-            colorFill(0,0);
-          }
-        } else {
-          myPix=random(0,NUM_LEDS);
-        }
-	
+  static int myPix = 0;
+  if(counter < sizeof(brightnessTable)) {
+//    float colorV = sin((6.28/30)*(float)(counter)) *255;
+    leds[myPix] = CHSV((256/sizeof(brightnessTable))*counter, 255, brightnessTable[counter]);
+    
+    FastLED.show();
+    delay(wait);
+  } else {
+    myPix = random(0,NUM_LEDS);
+    counter = 0;
+    colorFill(0,0);
+  }
 }
 
 
@@ -287,19 +271,4 @@ int antipodal_index(int i) {
         iN = (i + (NUM_LEDS / 2)) % NUM_LEDS;
     }
     return iN;
-}
-
-// horizontal index
-int horizontal_index(int i) {
-    //-ONLY WORKS WITH INDEX < TOPINDEX
-    if (i == BOTTOM_INDEX) {
-        return BOTTOM_INDEX;
-    }
-    if (i == TOP_INDEX && EVENODD == 1) {
-        return TOP_INDEX + 1;
-    }
-    if (i == TOP_INDEX && EVENODD == 0) {
-        return TOP_INDEX;
-    }
-    return 6 - i;
 }
