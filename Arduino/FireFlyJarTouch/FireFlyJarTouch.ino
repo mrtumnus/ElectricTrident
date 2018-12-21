@@ -51,43 +51,43 @@ void doSomething(int var) {
     case 0:
         colorFill(CRGB::Black, 0);
         break;
-//    case 1:
-//        colorFill(CRGB::White, 0);
-//        break;
-//    case 2:
-//        colorFill(CRGB(255, 147, 41), 0); // soft-white
-//        break;
-//    case 3:
-//        flame();
-//        break; 
-//    case 4:
-//        twinkle(CRGB(0, 0, 31), CRGB::White, 50);
-//        break;
+    case 1:
+        colorFill(CRGB::White, 0);
+        break;
+    case 2:
+        colorFill(CRGB(255, 147, 41), 0); // soft-white
+        break;
+    case 3:
+        // flame
+        randomize(11,34, 200,255, random(30,80));
+        break; 
+    case 4:
+        twinkle(CRGB(0, 0, 31), CRGB::White, 50);
+        break;
 //    case 5:
-//        chaseLights(CRGB:Red, CRGB:Blue, 100);
+//        chaseLights(CRGB::Red, CRGB::Blue, 100);
 //        break;  
-//    case 6:
-//        rainbow(50);
-//        break;
-//    case 7:
-//        rainbow(1);
-//        break;
-//    case 8:
-//        rainbowCycle(10);
-//        break;
-//    case 9:
-//        totallyRandom();
-//        break;
-//    case 10:
-//        colorWipe(CRGB(random(255), random(255), random(255)), 100); 
-//        break;
-//    case 11:
-//        sineFirefly(70);
-//        counter++;
-//        break;  
+    case 6:
+        rainbow(50);
+        break;
+    case 7:
+        rainbow(1);
+        break;
+    case 8:
+        rainbowCycle(10);
+        break;
+    case 9:
+        // totally random
+        randomize(0,359, 255,255, 50);
+        break;
+    case 10:
+        colorWipe(CRGB(random(255), random(255), random(255)), 100); 
+        break;
+    case 11:
+        sineFirefly(70);
+        break;  
     case 12:
         colorFirefly(100);
-        counter++;
         break;
 //    case 13:
 //        chaseLightsOddEven(100);
@@ -112,17 +112,16 @@ void doSomething(int var) {
 
 // Fill the dots one after the other with a color
 void colorWipe(CRGB c, uint8_t wait) {
-  static int nextLed = 0;
-  static CRGB color = c;
+  static CRGB latchedColor = c;
 
-  leds[nextLed] = color;
+  if (counter > NUM_LEDS) {
+    counter = 0;
+    latchedColor = c;
+  }
+
+  leds[counter] = latchedColor;
   FastLED.show();
   delay(wait);
-
-  if (++nextLed > NUM_LEDS) {
-    nextLed = 0;
-    color = c;
-  }
 }
 
 // Fill the entire strip with a single color at once
@@ -155,15 +154,7 @@ void rainbowCycle(uint8_t wait) {
 // Input a value 0 to 255 to get a color value.
 // The colours are a transition r - g - b - back to r.
 CRGB Wheel(byte WheelPos) {
-    if (WheelPos < 85) {
-        return CRGB(WheelPos * 3, 255 - WheelPos * 3, 0);
-    } else if (WheelPos < 170) {
-        WheelPos -= 85;
-        return CRGB(255 - WheelPos * 3, 0, WheelPos * 3);
-    } else {
-        WheelPos -= 170;
-        return CRGB(0, WheelPos * 3, 255 - WheelPos * 3);
-    }
+  return CHSV(WheelPos, 255, 255);
 }
 
 void chaseLights(CRGB c1, CRGB c2, int wait) { //-POLICE LIGHTS (TWO COLOR SINGLE LED)
@@ -214,40 +205,12 @@ void randomize(int minHue, int maxHue, int minVal, int maxVal, int wait) {
   delay(wait);
 }
 
-void flame() {
-  randomize(11,34, 200,255, random(30,80));
-}
-
-void totallyRandom() {
-  randomize(0,359, 255,255, 50);
-}
-
-int lastPix=0; int myPix=0;
-void sineFirefly(int wait) {
-        if(myPix != lastPix) {
-          if(counter<16) {
-            float colorV = sin((6.28/30)*(float)(counter)) *255;
-            leds[myPix] = CRGB(colorV,colorV,colorV);
-
-            FastLED.show();
-            delay(wait);
-          } else {
-            lastPix=myPix;
-            counter=0;
-            colorFill(0,0);
-          }
-        } else {
-          myPix=random(0,NUM_LEDS);
-        }
-	
-}
-
+// This table generated from: sin((6.28/30)*(float)(counter)) *255;
 static const uint8_t brightnessTable[] = {0,52,103,149,189,220,242,253,253,242,220,189,150,104,53,0};
-void colorFirefly(int wait) {
+void sineFirefly(int wait) {
   static int myPix = 0;
   if(counter < sizeof(brightnessTable)) {
-//    float colorV = sin((6.28/30)*(float)(counter)) *255;
-    leds[myPix] = CHSV((256/sizeof(brightnessTable))*counter, 255, brightnessTable[counter]);
+    leds[myPix] = CHSV(brightnessTable[counter], brightnessTable[counter], brightnessTable[counter]);
     
     FastLED.show();
     delay(wait);
@@ -255,6 +218,25 @@ void colorFirefly(int wait) {
     myPix = random(0,NUM_LEDS);
     counter = 0;
     colorFill(0,0);
+  }
+}
+
+void colorFirefly(int wait) {
+  static int myPix = 0;
+  if(counter < sizeof(brightnessTable)) {
+    leds[myPix] = CHSV(60, 255, brightnessTable[counter]);
+//    leds[myPix] = CHSV((256/sizeof(brightnessTable))*counter, 255, brightnessTable[counter]);
+    
+    FastLED.show();
+    delay(wait);
+  } else {
+    if (random(20) == 0) {
+      myPix = random(0,NUM_LEDS);
+      counter = 0;
+      colorFill(0,0);
+    } else {
+      delay(wait);
+    }
   }
 }
 
