@@ -12,7 +12,7 @@
 // USER VARS
 int mode = 1;
 int numMode = 12;
-#define NUM_LEDS      40
+#define NUM_LEDS      50
 #define LED_DATA_PIN  4
 
 // INIT STUFF
@@ -141,7 +141,6 @@ void rainbow(uint8_t wait) {
     }
     FastLED.show();
     delay(wait);
-    // }
 }
 
 // Slightly different, this makes the rainbow equally distributed throughout
