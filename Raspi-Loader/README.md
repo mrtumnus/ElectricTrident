@@ -43,3 +43,32 @@ Download and build WiringPi for the gpio commands
     cd wiringPi
     ./build
 
+Electrical Connections
+============================
+
+![Image](https://github.com/mrtumnus/firefly/raw/master/Misc/raspi-schematic.jpg)
+
+Connect up the ATtiny85 to the Raspberry Pi GPIO as follows:
+
+| Pi Pin | ATTiny Pin | Pin Usage |
+|:------:|:----------:| --------- |
+| 15 | 1 | GPIO22 to RESET |
+| 17 | 8 | 3.3V |
+| 19 | 5 | MOSI |
+| 21 | 6 | MISO |
+| 23 | 7 | SCLK |
+| 25 | 4 | GND |
+
+Test AVRDude Connection
+============================
+
+Test avrdude connection to the ATtiny85. GPIO pin 22 controls the ATTiny reset. This pin must be pulled low to program the chip.
+
+    sudo gpio -g mode 22 out
+    sudo gpio -g write 22 0
+    sudo avrdude -p t85 -P /dev/spidev0.0 -c linuxspi -b 10000
+    sudo gpio -g write 22 1
+
+If the avrdude command reports success, then you're good to go.
+
+
