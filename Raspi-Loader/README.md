@@ -31,7 +31,8 @@ Setup SPI on the GPIO
 
     sudo raspi-config
 
-Enable SPI device in the Advanced Options (see picture)
+Enable SPI device in the Advanced Options
+
 You can check this at the command line with lsmod, no need to reboot. (Maybe need to sudo modprobe spidev)
 
 Download and build WiringPi for the gpio commands
