@@ -8,9 +8,10 @@
 //   NEO_KHZ400  400 KHz bitstream (e.g. FLORA pixels)
 //   NEO_KHZ800  800 KHz bitstream (e.g. High Density LED strip)
 
-#define NUM_LEDS        10
+#define NUM_LEDS        50
 #define PIN_LEDS_MOSI   0
-#define PIN_BUTTON      1
+#define PIN_BUTTON      3
+#define PIN_LED         4
 #define NUM_MODES       12
 
 // USER VARS
@@ -18,7 +19,7 @@ int mode = 0;
 
 // INIT STUFF
 
-int counter = 0;
+unsigned int counter = 0;
 int dir = 1;
 
 // Start Strip
@@ -26,13 +27,15 @@ CRGB leds[NUM_LEDS];
 
 void setup() {
   pinMode(PIN_BUTTON, INPUT);
+  pinMode(PIN_LED, OUTPUT);
   FastLED.addLeds<WS2811, PIN_LEDS_MOSI>(leds, NUM_LEDS);
 }
 
 void loop() {
     static unsigned long lastButtonTime = 0;
     int buttonVal = digitalRead(PIN_BUTTON);    
-    if (buttonVal && (millis() - lastButtonTime) > 800) {
+    digitalWrite(PIN_LED, buttonVal);
+    if ((buttonVal == HIGH) && (millis() - lastButtonTime) > 800) {
       counter = 0;
       lastButtonTime = millis();
       mode++;
@@ -49,22 +52,20 @@ void loop() {
 void doSomething(int var) {
     switch (var) {
     case 0:
-    case 1:
         colorFill(CRGB::Yellow, 0);
         break;
+    case 1:
+        colorFill(CRGB::Orange, 0);
+        break;
     case 2:
-        colorFill(CRGB(255, 147, 41), 0); // soft-white
+        colorFill(CRGB::Red, 0);
         break;
     case 3:
-        // flame
-        randomize(11,34, 200,255, random(30,80));
+        colorFill(CRGB(255, 147, 41), 0); // soft-white
         break; 
     case 4:
         twinkle(CRGB(0, 0, 31), CRGB::White, 50);
         break;
-//    case 5:
-//        chaseLights(CRGB::Red, CRGB::Blue, 100);
-//        break;  
     case 6:
         rainbow(50);
         break;
