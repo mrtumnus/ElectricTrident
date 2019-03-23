@@ -12,14 +12,13 @@
 #define PIN_LEDS_MOSI   0
 #define PIN_BUTTON      3
 #define PIN_LED         4
-#define NUM_MODES       12
 
 // USER VARS
 int mode = 0;
 
 // INIT STUFF
 
-unsigned int counter = 0;
+uint8_t counter = 0;
 int dir = 1;
 
 // Start Strip
@@ -35,15 +34,14 @@ void loop() {
     static unsigned long lastButtonTime = 0;
     int buttonVal = digitalRead(PIN_BUTTON);    
     digitalWrite(PIN_LED, buttonVal);
-    if ((buttonVal == HIGH) && (millis() - lastButtonTime) > 800) {
+
+    // Button press with debounce
+    if ((buttonVal == LOW) && (millis() - lastButtonTime) > 2000) {
       counter = 0;
       lastButtonTime = millis();
       mode++;
     }
-    // if mode greater than NUM_MODES reset
-    if (mode > NUM_MODES) {
-      mode = 0;
-    }
+
     // main function
     doSomething(mode);
 }
@@ -52,57 +50,18 @@ void loop() {
 void doSomething(int var) {
     switch (var) {
     case 0:
-        colorFill(CRGB::Yellow, 0);
+//        colorFill(CRGB(58, 30, 4), 0);
+        colorFill(CRGB(3,1,0), 0);
         break;
     case 1:
-        colorFill(CRGB::Orange, 0);
+        colorWipe(CRGB(60, 20, 0), max(0xff - counter*10,10));
+//        colorWipe(CRGB(counter & 0x1f,(counter >> 5) & 0x3,0), 100);
         break;
-    case 2:
-        colorFill(CRGB::Red, 0);
-        break;
-    case 3:
-        colorFill(CRGB(255, 147, 41), 0); // soft-white
-        break; 
-    case 4:
-        twinkle(CRGB(0, 0, 31), CRGB::White, 50);
-        break;
-    case 6:
-        rainbow(50);
-        break;
-    case 7:
-        rainbow(1);
-        break;
-    case 8:
-        rainbowCycle(10);
-        break;
-    case 9:
-        // totally random
-        randomize(0,359, 255,255, 50);
-        break;
-    case 10:
-        colorWipe(CRGB(random(255), random(255), random(255)), 100); 
-        break;
-    case 11:
-        sineFirefly(70);
-        break;  
-    case 12:
-        colorFirefly(100);
-        break;
-//    case 13:
-//        chaseLightsOddEven(100);
-//        break;
     default:
-        mode++;
+        mode = 0;
         break;
     }
     
-    if (counter > 254) {
-        dir = -1;
-    }
-    if (counter < 1) {
-        dir = 1;
-    }
-
     counter += dir;
 }
 
@@ -111,15 +70,10 @@ void doSomething(int var) {
 
 // Fill the dots one after the other with a color
 void colorWipe(CRGB c, uint8_t wait) {
-  static CRGB latchedColor = c;
-
-  if (counter > NUM_LEDS) {
-    counter = 0;
-    latchedColor = c;
+  if (counter < NUM_LEDS) {
+    leds[counter] = c;
+    FastLED.show();
   }
-
-  leds[counter] = latchedColor;
-  FastLED.show();
   delay(wait);
 }
 
