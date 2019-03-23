@@ -1,5 +1,4 @@
 #include <FastLED.h> 
-#include <CapacitiveSensor.h>
 
 // Parameter 1 = number of pixels in strip
 // Parameter 2 = pin number (most are valid)
@@ -9,9 +8,10 @@
 //   NEO_KHZ400  400 KHz bitstream (e.g. FLORA pixels)
 //   NEO_KHZ800  800 KHz bitstream (e.g. High Density LED strip)
 
-#define NUM_LEDS      10
-#define LED_DATA_PIN  4
-#define NUM_MODES     12
+#define NUM_LEDS        10
+#define PIN_LEDS_MOSI   0
+#define PIN_BUTTON      1
+#define NUM_MODES       12
 
 // USER VARS
 int mode = 0;
@@ -21,26 +21,26 @@ int mode = 0;
 int counter = 0;
 int dir = 1;
 
-// Start Sensor
-CapacitiveSensor cs1 = CapacitiveSensor(0, 1); // 10M resistor between pins 0 & 1
-
 // Start Strip
 CRGB leds[NUM_LEDS];
 
 void setup() {
-  FastLED.addLeds<WS2811, LED_DATA_PIN>(leds, NUM_LEDS);
+  pinMode(PIN_BUTTON, INPUT);
+  FastLED.addLeds<WS2811, PIN_LEDS_MOSI>(leds, NUM_LEDS);
 }
 
 void loop() {
-    static unsigned long lastTouchTime;
-    long total1 = cs1.capacitiveSensor(30);    
-    if (total1 > 300 && (millis() - lastTouchTime) > 800) {
+    static unsigned long lastButtonTime = 0;
+    int buttonVal = digitalRead(PIN_BUTTON);    
+    if (buttonVal && (millis() - lastButtonTime) > 800) {
       counter = 0;
-      lastTouchTime = millis();
+      lastButtonTime = millis();
       mode++;
     }
     // if mode greater than NUM_MODES reset
-    if (mode > NUM_MODES) { mode = 0; }
+    if (mode > NUM_MODES) {
+      mode = 0;
+    }
     // main function
     doSomething(mode);
 }
@@ -49,10 +49,8 @@ void loop() {
 void doSomething(int var) {
     switch (var) {
     case 0:
-        colorFill(CRGB::Black, 0);
-        break;
     case 1:
-        colorFill(CRGB::White, 0);
+        colorFill(CRGB::Yellow, 0);
         break;
     case 2:
         colorFill(CRGB(255, 147, 41), 0); // soft-white
