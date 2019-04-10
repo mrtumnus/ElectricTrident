@@ -7,6 +7,7 @@ QT_BEGIN_NAMESPACE
 class QTimer;
 QT_END_NAMESPACE
 class Trident;
+class TridentAnimation;
 
 class Window : public QWidget
 {
@@ -22,6 +23,7 @@ public slots:
 private:
     QTimer *timer;
     Trident *trident;
+    TridentAnimation *ta;
 };
 
 #endif // WINDOW_H

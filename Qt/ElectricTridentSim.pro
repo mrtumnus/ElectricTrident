@@ -28,12 +28,14 @@ SOURCES += \
         main.cpp \
     trident.cpp \
     led.cpp \
-    window.cpp
+    window.cpp \
+    tridentanimation.cpp
 
 HEADERS += \
     trident.h \
     led.h \
-    window.h
+    window.h \
+    tridentanimation.h
 
 FORMS +=
 

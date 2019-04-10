@@ -1,11 +1,13 @@
 #include "window.h"
 #include "trident.h"
+#include "tridentanimation.h"
 
 #include <QtWidgets>
 
 Window::Window()
 {
     trident = new Trident;
+    ta = new TridentAnimation(trident);
 
     QGridLayout *mainLayout = new QGridLayout();
     mainLayout->addWidget(trident);
@@ -21,12 +23,13 @@ Window::~Window()
 {
     timer->stop();
     delete timer;
+    delete ta;
     // Don't delete trident - it's owned by the layout
 }
 
 
 void Window::animate()
 {
-    trident->animate();
+    ta->step();
     trident->update();
 }
