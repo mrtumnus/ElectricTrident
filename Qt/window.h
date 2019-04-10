@@ -6,7 +6,7 @@
 QT_BEGIN_NAMESPACE
 class QTimer;
 QT_END_NAMESPACE
-class Led;
+class Trident;
 
 class Window : public QWidget
 {
@@ -14,15 +14,14 @@ class Window : public QWidget
 
 public:
     Window();
-
-    static const int NUM_LEDS = 16;
+    ~Window();
 
 public slots:
     void animate();
 
 private:
-    Led *led[NUM_LEDS];
     QTimer *timer;
+    Trident *trident;
 };
 
 #endif // WINDOW_H
