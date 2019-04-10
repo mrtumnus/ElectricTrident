@@ -3,21 +3,21 @@
 
 #include <QtWidgets>
 
+#define RAND_HUE        (rand() % (MAX_HUE - MIN_HUE) + MIN_HUE)
+
 Trident::Trident(QWidget *parent) : QWidget(parent)
 {
-    QGridLayout *mainLayout = new QGridLayout;
-    int h,s,v,i,x,y;
+    QGridLayout *mainLayout = new QGridLayout();
+    int i,x,y;
     Led *(*pTineLedArr)[NUM_LEDS_TINE];
-    QColor color(Qt::blue);
-    color.getHsv(&h,&s,&v);
+    QColor color;
 
     // Allocate all LEDs
     for (i = 0; i < NUM_LEDS; i++)
     {
         leds[i] = new Led;
-        leds[i]->setColor(color);
-        h += 256/NUM_LEDS;
-        color.setHsv(h,s,v);
+        leds[i]->setColor(QColor::fromHsv(RAND_HUE, MIN_SAT, MIN_LUM));
+        ledDirs[i] = 1;
     }
 
     // Place shaft LEDs
@@ -57,14 +57,6 @@ Trident::Trident(QWidget *parent) : QWidget(parent)
     setLayout(mainLayout);
 }
 
-Trident::~Trident()
-{
-    for (int i = 0; i < NUM_LEDS; i++)
-    {
-        delete leds[i];
-    }
-}
-
 void Trident::animate()
 {
     for (int i = 0; i < NUM_LEDS; i++)
@@ -72,7 +64,18 @@ void Trident::animate()
         int h,s,v;
         QColor newColor = leds[i]->getColor();
         newColor.getHsv(&h, &s, &v);
-        h = (h + 1) % 256;
+        h = h + ledDirs[i];
+
+        if (h > MAX_HUE)
+        {
+            h = MAX_HUE;
+            ledDirs[i] = -1;
+        }
+        if (h < MIN_HUE)
+        {
+            h = MIN_HUE;
+            ledDirs[i] = 1;
+        }
         newColor.setHsv(h, s, v);
         leds[i]->setColor(newColor);
     }

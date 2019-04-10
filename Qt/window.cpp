@@ -5,22 +5,23 @@
 
 Window::Window()
 {
+    trident = new Trident;
+
+    QGridLayout *mainLayout = new QGridLayout();
+    mainLayout->addWidget(trident);
+    setLayout(mainLayout);
+
     timer = new QTimer(this);
     timer->setInterval(10);
     connect(timer, SIGNAL(timeout()), this, SLOT(animate()));
     timer->start();
-
-    trident = new Trident;
-
-    QGridLayout *mainLayout = new QGridLayout(this);
-    mainLayout->addWidget(trident);
-    setLayout(mainLayout);
 }
 
 Window::~Window()
 {
-    delete trident;
+    timer->stop();
     delete timer;
+    // Don't delete trident - it's owned by the layout
 }
 
 

@@ -5,7 +5,7 @@
 Led::Led(QWidget *parent)
     : QWidget(parent)
 {
-    color = QColor(3,1,0);
+    color = Qt::black;
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
 }
