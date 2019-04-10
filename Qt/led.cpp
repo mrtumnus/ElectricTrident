@@ -6,21 +6,21 @@ Led::Led(QWidget *parent)
     : QWidget(parent)
 {
     color = Qt::black;
-    setBackgroundRole(QPalette::Base);
-    setAutoFillBackground(true);
+//    setBackgroundRole(QPalette::Base);
+//    setAutoFillBackground(true);
 }
 
 
 QSize Led::minimumSizeHint() const
 {
-    return QSize(10, 10);
+    return QSize(DEFAULT_DIAMETER, DEFAULT_DIAMETER);
 }
 //! [1]
 
 //! [2]
 QSize Led::sizeHint() const
 {
-    return QSize(10, 10);
+    return QSize(DEFAULT_DIAMETER, DEFAULT_DIAMETER);
 }
 
 QColor Led::getColor()
@@ -37,7 +37,7 @@ void Led::setColor(QColor color)
 
 void Led::paintEvent(QPaintEvent * /* event */)
 {
-    QRect rect(2, 2, 6, 6);
+    QRect rect(0, 0, DEFAULT_DIAMETER, DEFAULT_DIAMETER);
     QPainter painter(this);
     painter.save();
     painter.setPen(Qt::black);

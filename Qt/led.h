@@ -18,6 +18,7 @@ public slots:
     void setColor(QColor color);
 
 protected:
+    const int DEFAULT_DIAMETER = 15;
     void paintEvent(QPaintEvent *event) override;
 
 private:

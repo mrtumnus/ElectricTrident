@@ -1,11 +1,13 @@
 #include "tridentanimation.h"
 #include "trident.h"
 
+#include <algorithm>
+
 #define RAND_HUE        (rand() % (MAX_HUE - MIN_HUE) + MIN_HUE)
 
 TridentAnimation::TridentAnimation(Trident *trident) :
     trident(trident),
-    counter(0)
+    speed_div(10)
 {
     ledDirs = new int[Trident::NUM_LEDS];
 
@@ -14,6 +16,8 @@ TridentAnimation::TridentAnimation(Trident *trident) :
         trident->setPixelHsv(i, RAND_HUE, MIN_SAT, MIN_LUM);
         ledDirs[i] = 1;
     }
+
+    reset();
 }
 
 TridentAnimation::~TridentAnimation()
@@ -26,8 +30,13 @@ void TridentAnimation::step()
     // Update color(s)
     for (int i = 0; i < Trident::NUM_LEDS; i++)
     {
-        int h,s,v;
+        int h,s,v,index,anim_index;
+        PixelType type;
+
+        getPixelLocation(i, type, index);
+        anim_index = type == SHAFT ? index : Trident::NUM_LEDS_SHAFT + index;
         trident->getPixelHsv(i, h, s, v);
+
         h = h + ledDirs[i];
 
         if (h > MAX_HUE)
@@ -40,15 +49,44 @@ void TridentAnimation::step()
             h = MIN_HUE;
             ledDirs[i] = 1;
         }
+
+        // Blend with energy bolt effect based on distance from it
+        int bolt_dist = abs(anim_index - counter/speed_div);
+
+        if (bolt_dist <= BOLT_INNER_RADIUS)
+        {
+            // Override entirely with bolt color
+            h = BOLT_H;
+            s = BOLT_S;
+            v = BOLT_V;
+        }
+        else if (bolt_dist <= BOLT_OUTER_RADIUS)
+        {
+            // Blend colors
+            const int BLEND_DIST = (BOLT_OUTER_RADIUS - BOLT_INNER_RADIUS);
+            bolt_dist -= BLEND_DIST;
+            h = (h * bolt_dist + BOLT_H * (BLEND_DIST - bolt_dist)) / BLEND_DIST;
+            s = (s * bolt_dist + BOLT_S * (BLEND_DIST - bolt_dist)) / BLEND_DIST;
+            v = (v * bolt_dist + BOLT_V * (BLEND_DIST - bolt_dist)) / BLEND_DIST;
+        }
+        else
+        {
+            // Don't touch the color
+        }
+
         trident->setPixelHsv(i, h, s, v);
     }
 
     counter++;
+    if (counter/speed_div >= 2*Trident::NUM_LEDS)
+    {
+        reset();
+    }
 }
 
 void TridentAnimation::reset()
 {
-    counter = 0;
+    counter = -BOLT_OUTER_RADIUS * speed_div;
 }
 
 int TridentAnimation::getPixelIndex(PixelType loc, int locIndex)
@@ -92,7 +130,7 @@ void TridentAnimation::getPixelLocation(int index, PixelType &loc, int &locIndex
     else
     {
         index -= Trident::NUM_LEDS_SHAFT;
-        loc = static_cast<PixelType>(index / Trident::NUM_LEDS_TINE);
-        locIndex = index - loc * Trident::NUM_LEDS_TINE;
+        loc = static_cast<PixelType>(index / Trident::NUM_LEDS_TINE + 1);
+        locIndex = index - (loc-1) * Trident::NUM_LEDS_TINE;
     }
 }
