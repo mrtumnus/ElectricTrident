@@ -29,13 +29,14 @@ SOURCES += \
     trident.cpp \
     led.cpp \
     window.cpp \
-    tridentanimation.cpp
+    ../Arduino/libraries/ElectricTrident/tridentanimation.cpp
 
 HEADERS += \
     trident.h \
     led.h \
     window.h \
-    tridentanimation.h
+    tridentanimation.h \
+    ../Arduino/libraries/ElectricTrident/tridentanimation.h
 
 FORMS +=
 
