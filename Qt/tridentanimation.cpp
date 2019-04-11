@@ -6,8 +6,7 @@
 #define RAND_HUE        (rand() % (MAX_HUE - MIN_HUE) + MIN_HUE)
 
 TridentAnimation::TridentAnimation(Trident *trident) :
-    trident(trident),
-    speed_div(10)
+    trident(trident)
 {
     ledDirs = new int[Trident::NUM_LEDS];
 
@@ -37,7 +36,8 @@ void TridentAnimation::step()
         anim_index = type == SHAFT ? index : Trident::NUM_LEDS_SHAFT + index;
         trident->getPixelHsv(i, h, s, v);
 
-        h = h + ledDirs[i];
+//        h = h + ledDirs[i];
+        h = h + rand() % 5 - 2; // bump hue by [-2,2]
 
         if (h > MAX_HUE)
         {
@@ -86,6 +86,7 @@ void TridentAnimation::step()
 
 void TridentAnimation::reset()
 {
+    speed_div = 1;
     counter = -BOLT_OUTER_RADIUS * speed_div;
 }
 

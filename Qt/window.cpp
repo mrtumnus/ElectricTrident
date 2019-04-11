@@ -14,7 +14,7 @@ Window::Window()
     setLayout(mainLayout);
 
     timer = new QTimer(this);
-    timer->setInterval(10);
+    timer->setInterval(20);
     connect(timer, SIGNAL(timeout()), this, SLOT(animate()));
     timer->start();
 }
