@@ -1,4 +1,6 @@
-#include <FastLED.h> 
+#include <FastLED.h>
+#include <trident.h>
+#include <tridentanimation.h>
 
 // Parameter 1 = number of pixels in strip
 // Parameter 2 = pin number (most are valid)
@@ -23,6 +25,8 @@ int dir = 1;
 
 // Start Strip
 CRGB leds[NUM_LEDS];
+Trident trident(leds);
+TridentAnimation animation(&trident);
 
 void setup() {
   pinMode(PIN_BUTTON, INPUT);
@@ -37,13 +41,13 @@ void loop() {
 
     // Button press with debounce
     if ((buttonVal == LOW) && (millis() - lastButtonTime) > 2000) {
-      counter = 0;
       lastButtonTime = millis();
-      mode++;
+      animation.reset();
     }
 
-    // main function
-    doSomething(mode);
+    animation.step();
+    FastLED.show();
+    delay(20);
 }
 
 
@@ -54,8 +58,10 @@ void doSomething(int var) {
         colorFill(CRGB(3,1,0), 0);
         break;
     case 1:
-        colorWipe(CRGB(60, 20, 0), max(0xff - counter*10,10));
+//        colorWipe(CRGB(60, 20, 0), max(0xff - counter*10,10));
 //        colorWipe(CRGB(counter & 0x1f,(counter >> 5) & 0x3,0), 100);
+
+        colorWipe(CRGB(240, 80, 0), max(0xff - counter*10,10));
         break;
     default:
         mode = 0;

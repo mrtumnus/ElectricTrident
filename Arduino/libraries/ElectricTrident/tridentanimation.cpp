@@ -1,7 +1,7 @@
 #include "tridentanimation.h"
 #include "trident.h"
 
-#include <algorithm>
+#include <stdlib.h>
 
 #define RAND_HUE        (rand() % (MAX_HUE - MIN_HUE) + MIN_HUE)
 
