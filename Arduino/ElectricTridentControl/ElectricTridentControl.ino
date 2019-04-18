@@ -36,7 +36,7 @@ void setup() {
 
 void loop() {
     static unsigned long lastButtonTime = 0;
-    int buttonVal = digitalRead(PIN_BUTTON);    
+    int buttonVal = digitalRead(PIN_BUTTON);
     digitalWrite(PIN_LED, buttonVal);
 
     // Button press with debounce

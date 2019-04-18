@@ -4,8 +4,6 @@
 
 Trident::Trident(CRGB * leds)
 {
-    CRGB color;
-
     this->leds = leds;
 }
 

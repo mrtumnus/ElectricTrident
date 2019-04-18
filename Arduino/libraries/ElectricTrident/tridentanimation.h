@@ -21,7 +21,9 @@ protected:
     const int MAX_LUM = 180;
     const int BOLT_INNER_RADIUS = 3;
     const int BOLT_OUTER_RADIUS = 6;
-    const int BOLT_H = 60;
+    // const int BOLT_H = 60; // yellow
+    // const int BOLT_H = 300; // pink
+    const int BOLT_H = 240; // blue
     const int BOLT_S = 255;
     const int BOLT_V = 250;
 

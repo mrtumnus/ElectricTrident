@@ -8,12 +8,9 @@
 TridentAnimation::TridentAnimation(Trident *trident) :
     trident(trident)
 {
-    ledDirs = new int[Trident::NUM_LEDS];
-
     for (int i = 0; i < Trident::NUM_LEDS; i++)
     {
         trident->setPixelHsv(i, RAND_HUE, MIN_SAT, MIN_LUM);
-        ledDirs[i] = 1;
     }
 
     reset();
@@ -21,7 +18,6 @@ TridentAnimation::TridentAnimation(Trident *trident) :
 
 TridentAnimation::~TridentAnimation()
 {
-    delete ledDirs;
 }
 
 void TridentAnimation::step()
@@ -36,18 +32,15 @@ void TridentAnimation::step()
         anim_index = type == SHAFT ? index : Trident::NUM_LEDS_SHAFT + index;
         trident->getPixelHsv(i, h, s, v);
 
-//        h = h + ledDirs[i];
         h = h + rand() % 5 - 2; // bump hue by [-2,2]
 
         if (h > MAX_HUE)
         {
             h = MAX_HUE;
-            ledDirs[i] = -1;
         }
         if (h < MIN_HUE)
         {
             h = MIN_HUE;
-            ledDirs[i] = 1;
         }
 
         // Blend with energy bolt effect based on distance from it
@@ -78,10 +71,6 @@ void TridentAnimation::step()
     }
 
     counter++;
-    if (counter/speed_div >= 2*Trident::NUM_LEDS)
-    {
-        reset();
-    }
 }
 
 void TridentAnimation::reset()
