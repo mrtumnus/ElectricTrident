@@ -35,22 +35,20 @@ protected:
 //    const int MAX_HUE = 253;
     const int MIN_SAT = 200;
     const int MAX_SAT = 240;
-    const int MIN_LUM = 64;
-    const int MAX_LUM = 120;
+    const int MIN_LUM = 20;
+    const int MAX_LUM = 80;
     const int BOLT_INNER_RADIUS = 3;
     const int BOLT_OUTER_RADIUS = 6;
     const int BOLT_H = HUE_AQUA;
     const int BOLT_S = 255;
     const int BOLT_V = 255;
-    const int GLOW_H = HUE_YELLOW;
-    const int GLOW_S = 0;
+    const int GLOW_H = HUE_BLUE;
+    const int GLOW_S = 200;
     const int GLOW_V = 255;
 
 private:
     Trident *trident;
     int counter;
-    int *ledDirs;
-    int speed_div;
 };
 
 #endif // TRIDENTANIMATION_H
