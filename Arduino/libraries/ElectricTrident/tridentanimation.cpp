@@ -26,10 +26,10 @@ void TridentAnimation::step()
     for (int i = 0; i < Trident::NUM_LEDS; i++)
     {
         int h,s,v,index,anim_index;
-        PixelType type;
+        Trident::PixelType type;
 
-        getPixelLocation(i, type, index);
-        anim_index = type == SHAFT ? index : Trident::NUM_LEDS_SHAFT + index;
+        trident->getPixelLocation(i, type, index);
+        anim_index = type == Trident::SHAFT ? index : Trident::NUM_LEDS_SHAFT + index;
         trident->getPixelHsv(i, h, s, v);
 
         // Blend with energy bolt effect based on distance from it
@@ -106,50 +106,4 @@ void TridentAnimation::reset()
 {
     speed_div = 1;
     counter = -BOLT_OUTER_RADIUS * speed_div;
-}
-
-int TridentAnimation::getPixelIndex(PixelType loc, int locIndex)
-{
-    int offset = -1;
-    switch (loc)
-    {
-    case SHAFT:
-        if (locIndex < Trident::NUM_LEDS_SHAFT)
-        {
-            offset = 0;
-        }
-        break;
-    case LEFT:
-    case CENTER:
-    case RIGHT:
-        if (locIndex < Trident::NUM_LEDS_TINE)
-        {
-            offset = Trident::NUM_LEDS_SHAFT + (loc - 1) * Trident::NUM_LEDS_TINE;
-        }
-        break;
-    }
-
-    if (offset >= 0)
-    {
-        return offset + locIndex;
-    }
-    else
-    {
-        return -1;
-    }
-}
-
-void TridentAnimation::getPixelLocation(int index, PixelType &loc, int &locIndex)
-{
-    if (index < Trident::NUM_LEDS_SHAFT)
-    {
-        loc = SHAFT;
-        locIndex = index;
-    }
-    else
-    {
-        index -= Trident::NUM_LEDS_SHAFT;
-        loc = static_cast<PixelType>(index / Trident::NUM_LEDS_TINE + 1);
-        locIndex = index - (loc-1) * Trident::NUM_LEDS_TINE;
-    }
 }

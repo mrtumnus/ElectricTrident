@@ -48,6 +48,52 @@ Trident::Trident(QWidget *parent) : QWidget(parent)
     setLayout(mainLayout);
 }
 
+int Trident::getPixelIndex(PixelType loc, int locIndex)
+{
+    int offset = -1;
+    switch (loc)
+    {
+    case SHAFT:
+        if (locIndex < Trident::NUM_LEDS_SHAFT)
+        {
+            offset = 0;
+        }
+        break;
+    case LEFT:
+    case CENTER:
+    case RIGHT:
+        if (locIndex < Trident::NUM_LEDS_TINE)
+        {
+            offset = Trident::NUM_LEDS_SHAFT + (loc - 1) * Trident::NUM_LEDS_TINE;
+        }
+        break;
+    }
+
+    if (offset >= 0)
+    {
+        return offset + locIndex;
+    }
+    else
+    {
+        return -1;
+    }
+}
+
+void Trident::getPixelLocation(int index, PixelType &loc, int &locIndex)
+{
+    if (index < Trident::NUM_LEDS_SHAFT)
+    {
+        loc = SHAFT;
+        locIndex = index;
+    }
+    else
+    {
+        index -= Trident::NUM_LEDS_SHAFT;
+        loc = static_cast<PixelType>(index / Trident::NUM_LEDS_TINE + 1);
+        locIndex = index - (loc-1) * Trident::NUM_LEDS_TINE;
+    }
+}
+
 
 void Trident::setPixelHsv(int index, int h, int s, int v)
 {

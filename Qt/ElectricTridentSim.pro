@@ -38,7 +38,8 @@ HEADERS += \
     window.h \
     tridentanimation.h \
     ../Arduino/libraries/ElectricTrident/tridentanimation.h \
-    ../Arduino/libraries/ElectricTrident/tridentanimationtest.h
+    ../Arduino/libraries/ElectricTrident/tridentanimationtest.h \
+    ../Arduino/libraries/ElectricTrident/trident.h
 
 FORMS +=
 

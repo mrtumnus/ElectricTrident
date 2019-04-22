@@ -42,11 +42,9 @@ protected:
     const int BOLT_H = HUE_AQUA;
     const int BOLT_S = 255;
     const int BOLT_V = 255;
-
-    typedef enum {SHAFT, LEFT, CENTER, RIGHT} PixelType;
-
-    int getPixelIndex(PixelType loc, int locIndex);
-    void getPixelLocation(int index, PixelType &loc, int &locIndex);
+    const int GLOW_H = HUE_YELLOW;
+    const int GLOW_S = 0;
+    const int GLOW_V = 255;
 
 private:
     Trident *trident;

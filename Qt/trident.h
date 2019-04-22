@@ -20,6 +20,11 @@ public:
     void setPixelHsv(int index, int h, int s, int v);
     void getPixelHsv(int index, int &h, int &s, int &v);
 
+
+    typedef enum {SHAFT, LEFT, CENTER, RIGHT} PixelType;
+    int getPixelIndex(PixelType loc, int locIndex);
+    void getPixelLocation(int index, PixelType &loc, int &locIndex);
+
 signals:
 
 public slots:
