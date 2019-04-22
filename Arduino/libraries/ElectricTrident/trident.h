@@ -8,7 +8,7 @@ class Trident
 public:
     explicit Trident(CRGB * leds);
 
-    static const int NUM_LEDS = 50;
+    static const int NUM_LEDS = 60;
     static const int NUM_LEDS_TINE = 7;
     static const int NUM_TINES = 3;
     static const int NUM_LEDS_SHAFT = NUM_LEDS - (NUM_TINES * NUM_LEDS_TINE);

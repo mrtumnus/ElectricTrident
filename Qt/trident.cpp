@@ -53,6 +53,8 @@ void Trident::setPixelHsv(int index, int h, int s, int v)
 {
     if (index < NUM_LEDS)
     {
+        // h range for FastLED is 0-255, but Qt uses standard 0-359 range
+        h = (h * 360 + 128)/256;
         leds[index]->setColor(QColor::fromHsv(h, s, v));
     }
 }
@@ -61,5 +63,12 @@ void Trident::getPixelHsv(int index, int &h, int &s, int &v)
     if (index < NUM_LEDS)
     {
         leds[index]->getColor().getHsv(&h, &s, &v);
+        // h range for FastLED is 0-255, but Qt uses standard 0-359 range
+        h = (h * 256 + 180)/360;
     }
+}
+
+long random(long max)
+{
+    return rand() % max;
 }

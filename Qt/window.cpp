@@ -14,7 +14,7 @@ Window::Window()
     setLayout(mainLayout);
 
     timer = new QTimer(this);
-    timer->setInterval(20);
+    timer->setInterval(10);
     connect(timer, SIGNAL(timeout()), this, SLOT(animate()));
     timer->start();
 }
@@ -32,4 +32,11 @@ void Window::animate()
 {
     ta->step();
     trident->update();
+}
+
+void Window::mousePressEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton) {
+        ta->reset();
+    }
 }

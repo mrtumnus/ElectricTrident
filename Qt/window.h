@@ -20,6 +20,9 @@ public:
 public slots:
     void animate();
 
+protected:
+    void mousePressEvent(QMouseEvent *event) override;
+
 private:
     QTimer *timer;
     Trident *trident;

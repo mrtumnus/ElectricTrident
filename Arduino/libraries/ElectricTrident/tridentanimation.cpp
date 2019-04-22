@@ -3,17 +3,17 @@
 
 #include <stdlib.h>
 
-#define RAND_HUE        (rand() % (MAX_HUE - MIN_HUE) + MIN_HUE)
+extern long random(long);
 
 TridentAnimation::TridentAnimation(Trident *trident) :
     trident(trident)
 {
     for (int i = 0; i < Trident::NUM_LEDS; i++)
     {
-        trident->setPixelHsv(i, RAND_HUE, MIN_SAT, MIN_LUM);
+        trident->setPixelHsv(i, random(MAX_HUE - MIN_HUE + 1) + MIN_HUE, MIN_SAT, MIN_LUM);
     }
-
-    reset();
+    speed_div = 1;
+    counter = Trident::NUM_LEDS + BOLT_OUTER_RADIUS;
 }
 
 TridentAnimation::~TridentAnimation()
@@ -31,17 +31,6 @@ void TridentAnimation::step()
         getPixelLocation(i, type, index);
         anim_index = type == SHAFT ? index : Trident::NUM_LEDS_SHAFT + index;
         trident->getPixelHsv(i, h, s, v);
-
-        h = h + rand() % 5 - 2; // bump hue by [-2,2]
-
-        if (h > MAX_HUE)
-        {
-            h = MAX_HUE;
-        }
-        if (h < MIN_HUE)
-        {
-            h = MIN_HUE;
-        }
 
         // Blend with energy bolt effect based on distance from it
         int bolt_dist = abs(anim_index - counter/speed_div);
@@ -64,7 +53,47 @@ void TridentAnimation::step()
         }
         else
         {
-            // Don't touch the color
+            if (h > MAX_HUE)
+            {
+                h -= 2;
+            }
+            else if (h < MIN_HUE)
+            {
+                h += 2;
+            }
+            else
+            {
+                // Let the color drift randomly
+                h = h + random(5) - 2;
+            }
+
+            if (s > MAX_SAT)
+            {
+                s -= 2;
+            }
+            else if (v < MIN_SAT)
+            {
+                s += 2;
+            }
+            else
+            {
+                // Let the saturation drift randomly
+                s = s + random(5) - 2;
+            }
+
+            if (v > MAX_LUM)
+            {
+                v -= 2;
+            }
+            else if (v < MIN_LUM)
+            {
+                v += 2;
+            }
+            else
+            {
+                // Let the brightness drift randomly
+                v = v + random(5) - 2;
+            }
         }
 
         trident->setPixelHsv(i, h, s, v);
