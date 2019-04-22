@@ -1,6 +1,7 @@
 #include "window.h"
 #include "trident.h"
 #include "tridentanimation.h"
+#include "tridentanimationtest.h"
 
 #include <QtWidgets>
 

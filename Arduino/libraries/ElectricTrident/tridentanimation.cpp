@@ -5,6 +5,10 @@
 
 extern long random(long);
 
+TridentAnimationBase::~TridentAnimationBase()
+{
+}
+
 TridentAnimation::TridentAnimation(Trident *trident) :
     trident(trident)
 {
@@ -14,10 +18,6 @@ TridentAnimation::TridentAnimation(Trident *trident) :
     }
     speed_div = 1;
     counter = Trident::NUM_LEDS + BOLT_OUTER_RADIUS;
-}
-
-TridentAnimation::~TridentAnimation()
-{
 }
 
 void TridentAnimation::step()

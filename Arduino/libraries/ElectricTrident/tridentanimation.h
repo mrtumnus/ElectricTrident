@@ -12,18 +12,25 @@ class Trident;
 #define HUE_BLUE    160
 #define HUE_PINK    224
 
-class TridentAnimation
+class TridentAnimationBase
+{
+public:
+    virtual ~TridentAnimationBase();
+    virtual void step() = 0;
+    virtual void reset() = 0;
+};
+
+class TridentAnimation : public TridentAnimationBase
 {
 public:
     TridentAnimation(Trident *trident);
-    ~TridentAnimation();
 
     void step();
     void reset();
 
 protected:
      const int MIN_HUE = (HUE_RED + HUE_ORANGE)/2;
-     const int MAX_HUE = (HUE_ORANGE + HUE_YELLOW)/2;
+     const int MAX_HUE = HUE_YELLOW;//(HUE_ORANGE + HUE_YELLOW)/2;
 //    const int MIN_HUE = 0;
 //    const int MAX_HUE = 253;
     const int MIN_SAT = 200;

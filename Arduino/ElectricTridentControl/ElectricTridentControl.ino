@@ -1,6 +1,7 @@
 #include <FastLED.h>
 #include <trident.h>
 #include <tridentanimation.h>
+#include <tridentanimationtest.h>
 
 // Parameter 1 = number of pixels in strip
 // Parameter 2 = pin number (most are valid)
@@ -27,6 +28,7 @@ int dir = 1;
 CRGB leds[NUM_LEDS];
 Trident trident(leds);
 TridentAnimation animation(&trident);
+//TridentAnimationTest animation(&trident);
 
 void setup() {
   pinMode(PIN_BUTTON, INPUT);
